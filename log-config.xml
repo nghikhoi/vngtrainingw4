@@ -1,0 +1,37 @@
+<!-- 
+Mục đích: log lại các bước di chuyển của một người chơi trên một server game Open World (server single-thread) ở quá trình phát triển
+- Log ở level debug và error
+- RollingFileAppender để chia nhỏ các file ghi ra theo ngày và kích cỡ. Mục đích để làm tăng hiệu năng khi ghi file.
+- Pattern không cần log ngày ra vì đã có chia file theo ngày.
+-->
+<configuration>
+	<property name="DEV_HOME" value="${env:BASE_DIR}" />
+
+	<appender name="FILE-AUDIT"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${DEV_HOME}/debug.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{HH:mm:ss} - %msg%n
+			</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${DEV_HOME}/archived/debug.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>200MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+
+	</appender>
+
+	<logger name="khoinlm2" level="debug" additivity="false">
+		<appender-ref ref="FILE-AUDIT" />
+	</logger>
+
+	<root level="error">
+		<appender-ref ref="FILE-AUDIT" />
+	</root>
+</configuration>
